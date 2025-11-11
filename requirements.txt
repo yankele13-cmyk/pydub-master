@@ -1,0 +1,10 @@
+torch
+torchaudio
+torchcodec
+librosa
+safetensors
+transformers==4.46.3
+s3tokenizer
+conformer
+diffusers
+ffmpeg
