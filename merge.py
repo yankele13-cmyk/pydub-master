@@ -16,7 +16,8 @@ def merge_with_ducking(
     output_path: str,
     duck_amount_db: float = 15.0,
     silence_thresh_db: int = -40,
-    min_silence_len_ms: int = 500
+    min_silence_len_ms: int = 500,
+    repeat_music: bool = False
 ) -> None:
     """
     Merges a voice track with background music, applying audio ducking.
@@ -42,7 +43,7 @@ def merge_with_ducking(
         music = AudioSegment.from_file(music_path)
 
         # 1. Ensure music is long enough for the voice track
-        if len(music) < len(voice):
+        if repeat_music and len(music) < len(voice):
             print(" Music is shorter than voice, looping music...")
             # Calculate how many times to repeat the music
             repeat_factor = -(-len(voice) // len(music)) # Ceiling division
@@ -69,15 +70,10 @@ def merge_with_ducking(
         # 3. Apply ducking to the music track
         print(f"🦆 Applying ducking of {duck_amount_db} dB to music...")
         ducked_music = music
-        for start_time, end_time in nonsilent_ranges:
-            # Get the segment of music that corresponds to the speech
-            music_segment = ducked_music[start_time:end_time]
-            
-            # Reduce its volume
+        for start, end in nonsilent_ranges:
+            music_segment = ducked_music[start:end]
             ducked_segment = music_segment - duck_amount_db
-            
-            # Overlay the quieter segment back onto the music track
-            ducked_music = ducked_music.overlay(ducked_segment, position=start_time)
+            ducked_music = ducked_music[:start].append(ducked_segment).append(ducked_music[end:])
         
         # 4. Overlay the original voice on the ducked music
         print("🎚️  Mixing final audio...")
