@@ -80,4 +80,4 @@ def trim_audio(
 
 # Example usage
 if __name__ == "__main__":
-    trim_audio("chipopo1.m4a", "output.mp3", top_db=40, ref=0.5)
+    trim_audio("chipopo4.m4a", "output.mp3", top_db=40, ref=0.5)
